@@ -180,6 +180,8 @@ def question1D():
     print("The predicted values of the target variable:")
     print(y_pred)
     X_train, X_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.2, shuffle=True)
+    print(X_train)
+    print(X_test)
 
     plt.scatter(x_data, y_data)
     plt.xlabel("Trips 1-25 Miles Across 7 days")
@@ -204,4 +206,5 @@ def question1E():
     plt.legend(title="Trip Distance", loc="upper right")
     plt.tight_layout()
     plt.show()
-    
+
+question1D()

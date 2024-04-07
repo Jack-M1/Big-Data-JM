@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from dask import dataframe as dd
 import time
+from sklearn.linear_model import LinearRegression
+from dask_ml.model_selection import train_test_split
 
 def question1A_Part1():
     start_time=time.time()
@@ -36,9 +38,11 @@ def question1A_Part2():
     print(dataset.duplicated())
     colDistances = ["Trips <1 Mile", "Trips 1-25 Miles", "Trips 1-3 Miles", "Trips 10-25 Miles", "Trips 100-250 Miles", "Trips 100+ Miles", "Trips 25-100 Miles", "Trips 25-50 Miles", "Trips 250-500 Miles", "Trips 3-5 Miles", "Trips 5-10 Miles", "Trips 50-100 Miles", "Trips 500+ Miles"]
     averageDistances = []
+    print("Average Number of Trips:")
     for i in range(len(colDistances)):
         averageDistances.append(round(dataset[colDistances[i]].mean()))
-        #print(averageDistances[i])
+        print(colDistances[i])
+        print(averageDistances[i])
     
 
     plt.bar(colDistances, averageDistances)
@@ -60,16 +64,21 @@ def question1B():
     dataset = dataset.query("`Level`=='National'")
     tripDistance1 = dataset.query("`Number of Trips 10-25` > 10000000")
     tripDistance2 = dataset.query("`Number of Trips 50-100` > 10000000")
+    print("Number of Trips 10-25 > 10000000")
+    print(tripDistance1)
+    print("Number of Trips 50-100 > 10000000")
+    print(tripDistance2)
 
     serialTime=time.time()-start_time
     print("Timing for serial question 1B:")
     print(serialTime)
 
-    plt.scatter(tripDistance1["Date"], tripDistance1["Number of Trips 10-25"], s=3, alpha=0.5)
-    plt.scatter(tripDistance2["Date"], tripDistance2["Number of Trips 50-100"], s=3, alpha=0.5)
+    plt.scatter(tripDistance1["Date"], tripDistance1["Number of Trips 10-25"], s=3, alpha=0.5, label="Trips 10-25")
+    plt.scatter(tripDistance2["Date"], tripDistance2["Number of Trips 50-100"], s=3, alpha=0.5, label="Trips 50-100")
     plt.xlabel("Date")
     plt.ylabel("Number of Trips")
     plt.xticks(rotation=80)
+    plt.legend()
     plt.title("Question 1B")
     plt.tight_layout()
     plt.show()
@@ -145,6 +154,39 @@ def question1C():
     print("Timing for each iteration of question 1B:")
     print(n_processors_time)
 
+def question1D():
+    tripsByDistance = pd.read_csv("Trips_By_Distance.csv")
+    tripsFullData = pd.read_csv("Trips_Full Data.csv")
+
+    y_data = tripsByDistance
+    y_data = y_data.query("`Level`=='National'")
+    y_data = y_data[y_data["Week"]==31]
+    y_data = y_data[y_data["Date"].str.contains("2019")]
+    y_data = y_data["Number of Trips 10-25"]
+    x_data = tripsFullData["Trips 1-25 Miles"]
+    x_data = x_data.to_frame(name="Trips 1-25 Miles")
+    y_data = y_data.to_frame(name="Number of Trips 10-25")
+    #print(x_data)
+    #print(y_data)
+
+    model = LinearRegression().fit(x_data, y_data)
+    r_sq = model.score(x_data, y_data)
+    print("R squared of model is:")
+    print(r_sq)
+
+    #y_pred = model.predict(x_data)
+    #print(y_pred)
+    y_pred = model.intercept_ + model.coef_ * x_data
+    print("The predicted values of the target variable:")
+    print(y_pred)
+    X_train, X_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.2, shuffle=True)
+
+    plt.scatter(x_data, y_data)
+    plt.xlabel("Trips 1-25 Miles Across 7 days")
+    plt.ylabel("Number of Trips 10-25")
+    plt.title("Question 1D")
+    plt.show()
+
 def question1E():
     dataset = pd.read_csv("Trips_Full Data.csv")
     colDistances = ["Trips <1 Mile", "Trips 1-25 Miles", "Trips 1-3 Miles", "Trips 10-25 Miles", "Trips 100-250 Miles", "Trips 100+ Miles", "Trips 25-100 Miles", "Trips 25-50 Miles", "Trips 250-500 Miles", "Trips 3-5 Miles", "Trips 5-10 Miles", "Trips 50-100 Miles", "Trips 500+ Miles"] # Change this to manual colums excluding trips which is currently included
@@ -162,3 +204,4 @@ def question1E():
     plt.legend(title="Trip Distance", loc="upper right")
     plt.tight_layout()
     plt.show()
+    

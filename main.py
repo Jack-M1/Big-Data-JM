@@ -191,7 +191,7 @@ def question1D():
 
 def question1E():
     dataset = pd.read_csv("Trips_Full Data.csv")
-    colDistances = ["Trips <1 Mile", "Trips 1-25 Miles", "Trips 1-3 Miles", "Trips 10-25 Miles", "Trips 100-250 Miles", "Trips 100+ Miles", "Trips 25-100 Miles", "Trips 25-50 Miles", "Trips 250-500 Miles", "Trips 3-5 Miles", "Trips 5-10 Miles", "Trips 50-100 Miles", "Trips 500+ Miles"] # Change this to manual colums excluding trips which is currently included
+    colDistances = ["Trips <1 Mile", "Trips 1-25 Miles", "Trips 1-3 Miles", "Trips 10-25 Miles", "Trips 100-250 Miles", "Trips 100+ Miles", "Trips 25-100 Miles", "Trips 25-50 Miles", "Trips 250-500 Miles", "Trips 3-5 Miles", "Trips 5-10 Miles", "Trips 50-100 Miles", "Trips 500+ Miles"]
     dataset[colDistances].plot(kind='bar', stacked=True)
     datetime = []
     for i in range(len(dataset["Date"])):
@@ -206,5 +206,3 @@ def question1E():
     plt.legend(title="Trip Distance", loc="upper right")
     plt.tight_layout()
     plt.show()
-
-question1D()
